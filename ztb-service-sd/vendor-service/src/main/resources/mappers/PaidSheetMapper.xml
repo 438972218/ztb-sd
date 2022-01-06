@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xdcplus.vendor.mapper.PaidSheetMapper">
+
+    <resultMap type="com.xdcplus.vendor.common.pojo.entity.PaidSheet" id="PaidSheetMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="requestId" column="request_id" jdbcType="INTEGER"/>
+        <result property="projectSheetId" column="project_sheet_id" jdbcType="INTEGER"/>
+        <result property="paidStatusMark" column="paid_status_mark" jdbcType="INTEGER"/>
+        <result property="paidStatus" column="paid_status" jdbcType="VARCHAR"/>
+        <result property="paidNum" column="paid_num" jdbcType="VARCHAR"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="offerStartTime" column="offer_start_time" jdbcType="INTEGER"/>
+        <result property="offerEndTime" column="offer_end_time" jdbcType="INTEGER"/>
+        <result property="budget" column="budget" jdbcType="NUMERIC"/>
+        <result property="currency" column="currency" jdbcType="VARCHAR"/>
+        <result property="whetherTest" column="whether_test" jdbcType="INTEGER"/>
+        <result property="paidDirection" column="paid_direction" jdbcType="VARCHAR"/>
+        <result property="bidStructure" column="bid_structure" jdbcType="VARCHAR"/>
+        <result property="vendorMonitorRules" column="vendor_monitor_rules" jdbcType="VARCHAR"/>
+        <result property="startPriceRule" column="start_price_rule" jdbcType="VARCHAR"/>
+        <result property="delayInterval" column="delay_interval" jdbcType="INTEGER"/>
+        <result property="pauseTime" column="pause_time" jdbcType="INTEGER"/>
+        <result property="items" column="items" jdbcType="VARCHAR"/>
+        <result property="createdUser" column="created_user" jdbcType="VARCHAR"/>
+        <result property="createdTime" column="created_time" jdbcType="INTEGER"/>
+        <result property="updatedUser" column="updated_user" jdbcType="VARCHAR"/>
+        <result property="updatedTime" column="updated_time" jdbcType="INTEGER"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+        <result property="deleted" column="deleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPaidSheet" resultMap="PaidSheetMap">
+        select
+          id, request_id, project_sheet_id, paid_status_mark, paid_status, paid_num, title, offer_start_time, offer_end_time, budget, currency, whether_test, paid_direction, bid_structure, vendor_monitor_rules, start_price_rule, delay_interval, pause_time, items, created_user, created_time, updated_user, updated_time, description, version, deleted
+          from scm_paid_sheet
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="requestId != null">
+                and request_id = #{requestId}
+            </if>
+            <if test="projectSheetId != null">
+                and project_sheet_id = #{projectSheetId}
+            </if>
+            <if test="paidStatusMark != null">
+                and paid_status_mark = #{paidStatusMark}
+            </if>
+            <if test="paidStatus != null and paidStatus != ''">
+                and paid_status = #{paidStatus}
+            </if>
+            <if test="paidNum != null and paidNum != ''">
+                and paid_num = #{paidNum}
+            </if>
+            <if test="title != null and title != ''">
+                and title = #{title}
+            </if>
+            <if test="offerStartTime != null">
+                and offer_start_time = #{offerStartTime}
+            </if>
+            <if test="offerEndTime != null">
+                and offer_end_time = #{offerEndTime}
+            </if>
+            <if test="budget != null">
+                and budget = #{budget}
+            </if>
+            <if test="currency != null and currency != ''">
+                and currency = #{currency}
+            </if>
+            <if test="whetherTest != null">
+                and whether_test = #{whetherTest}
+            </if>
+            <if test="paidDirection != null and paidDirection != ''">
+                and paid_direction = #{paidDirection}
+            </if>
+            <if test="bidStructure != null and bidStructure != ''">
+                and bid_structure = #{bidStructure}
+            </if>
+            <if test="vendorMonitorRules != null and vendorMonitorRules != ''">
+                and vendor_monitor_rules = #{vendorMonitorRules}
+            </if>
+            <if test="startPriceRule != null and startPriceRule != ''">
+                and start_price_rule = #{startPriceRule}
+            </if>
+            <if test="delayInterval != null">
+                and delay_interval = #{delayInterval}
+            </if>
+            <if test="pauseTime != null">
+                and pause_time = #{pauseTime}
+            </if>
+            <if test="items != null and items != ''">
+                and items = #{items}
+            </if>
+            <if test="createdUser != null and createdUser != ''">
+                and created_user = #{createdUser}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedUser != null and updatedUser != ''">
+                and updated_user = #{updatedUser}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            <if test="description != null and description != ''">
+                and description = #{description}
+            </if>
+            <if test="version != null">
+                and version = #{version}
+            </if>
+            <if test="deleted != null">
+                and deleted = #{deleted}
+            </if>
+            <if test="keyword != null">
+                AND (
+                    title like CONCAT('%', #{keyword}, '%')
+                    or items like CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+    </select>
+    <select id="queryPaidSheetByVendor" resultMap="PaidSheetMap">
+        select DISTINCT s.id, s.request_id, s.project_sheet_id, s.paid_status_mark, s.paid_status, s.paid_num,
+        s.title, s.offer_start_time,s.start_price_rule, s.offer_end_time, s.currency, s.whether_test, s.paid_direction,
+        s.bid_structure, s.vendor_monitor_rules,
+         s.delay_interval, s.pause_time, s.items, s.created_user, s.created_time,
+        s.updated_user, s.updated_time, s.description, s.version, s.deleted
+          from scm_paid_sheet s left join scm_paid_vendor v on s.id=v.paid_sheet_id
+        <where>
+            s.request_id is not null
+            <if test="id != null">
+                and s.id = #{id}
+            </if>
+            <if test="requestId != null">
+                and s.request_id = #{requestId}
+            </if>
+            <if test="projectSheetId != null">
+                and s.project_sheet_id = #{projectSheetId}
+            </if>
+            <if test="paidStatusMark != null">
+                and s.paid_status_mark = #{paidStatusMark}
+            </if>
+            <if test="paidStatus != null and paidStatus != ''">
+                and s.paid_status = #{paidStatus}
+            </if>
+            <if test="paidNum != null and paidNum != ''">
+                and s.paid_num = #{paidNum}
+            </if>
+            <if test="title != null and title != ''">
+                and s.title = #{title}
+            </if>
+            <if test="offerStartTime != null">
+                and s.offer_start_time = #{offerStartTime}
+            </if>
+            <if test="offerEndTime != null">
+                and s.offer_end_time = #{offerEndTime}
+            </if>
+            <if test="budget != null">
+                and s.budget = #{budget}
+            </if>
+            <if test="currency != null and currency != ''">
+                and s.currency = #{currency}
+            </if>
+            <if test="whetherTest != null">
+                and s.whether_test = #{whetherTest}
+            </if>
+            <if test="paidDirection != null and paidDirection != ''">
+                and s.paid_direction = #{paidDirection}
+            </if>
+            <if test="bidStructure != null and bidStructure != ''">
+                and s.bid_structure = #{bidStructure}
+            </if>
+            <if test="delayInterval != null">
+                and s.delay_interval = #{delayInterval}
+            </if>
+            <if test="pauseTime != null">
+                and s.pause_time = #{pauseTime}
+            </if>
+            <if test="items != null and items != ''">
+                and s.items = #{items}
+            </if>
+            <if test="createdUser != null and createdUser != ''">
+                and s.created_user = #{createdUser}
+            </if>
+            <if test="createdTime != null">
+                and s.created_time = #{createdTime}
+            </if>
+            <if test="updatedUser != null and updatedUser != ''">
+                and s.updated_user = #{updatedUser}
+            </if>
+            <if test="updatedTime != null">
+                and s.updated_time = #{updatedTime}
+            </if>
+            <if test="description != null and description != ''">
+                and s.description = #{description}
+            </if>
+            <if test="version != null">
+                and s.version = #{version}
+            </if>
+            <if test="deleted != null">
+                and s.deleted = #{deleted}
+            </if>
+            <if test="vendorUserId != null">
+                and v.vendor_user_id = #{vendorUserId}
+            </if>
+            <if test="requestIds != null">
+                AND (s.request_id in
+                    <foreach collection="requestIds" index="index" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    )
+            </if>
+        </where>
+    </select>
+
+    <select id="findPaidSheetByRequestId" resultMap="PaidSheetMap">
+        select
+            id, request_id, project_sheet_id, paid_status_mark, paid_status, paid_num,
+            title, offer_start_time, offer_end_time, budget, currency, whether_test, paid_direction,
+            bid_structure, vendor_monitor_rules, start_price_rule, delay_interval, pause_time, items,
+            created_user, created_time, updated_user, updated_time, description, version, deleted
+        from scm_paid_sheet
+        where request_id = #{requestId,jdbcType=BIGINT}
+    </select>
+
+    <update id="updatePaidStatusMarkByRequestId">
+        update scm_paid_sheet set paid_status_mark = #{paidStatusMark,jdbcType=INTEGER},
+        paid_status = #{paidStatus,jdbcType=VARCHAR}
+        where request_id = #{requestId,jdbcType=BIGINT}
+    </update>
+</mapper>
+

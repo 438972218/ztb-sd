@@ -1,0 +1,371 @@
+<template>
+  <div>
+    <a-card class="card-top">
+      <a-form-model
+        layout="horizontal"
+        ref="ruleForm"
+        :rules="rules"
+        :model="form"
+      >
+        <a-row>
+          <a-col :sm="24" :md="12" :xl="12">
+            <a-form-model-item
+              prop="vendorId"
+              class="form-item-style"
+              label="供应商名称"
+              :labelCol="{ span: 5 }"
+              :wrapperCol="{ span: 17 }"
+            >
+              <a-select
+                v-model="form.vendorId"
+                placeholder="请选择"
+                :disabled="disableds"
+              >
+                <a-select-option
+                  v-for="item in vendorList"
+                  :key="item.id"
+                  :value="item.id"
+                  >{{ item.name }}</a-select-option
+                >
+              </a-select>
+            </a-form-model-item>
+          </a-col>
+          <a-col :sm="24" :md="12" :xl="12">
+            <a-form-model-item
+              prop="name"
+              class="form-item-style"
+              label="评审表名称"
+              :labelCol="{ span: 5 }"
+              :wrapperCol="{ span: 17 }"
+            >
+              <a-input v-model="form.name" :disabled="disableds" />
+            </a-form-model-item>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :sm="24" :md="12" :xl="12">
+            <a-form-model-item
+              prop="responsiblePerson"
+              class="form-item-style"
+              label="负责人"
+              :labelCol="{ span: 5 }"
+              :wrapperCol="{ span: 17 }"
+            >
+              <a-input v-model="form.responsiblePerson" :disabled="disableds" />
+            </a-form-model-item>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :sm="24" :md="12" :xl="12">
+            <a-form-model-item
+              prop="bank"
+              class="form-item-style"
+              label="评审模板"
+              :labelCol="{ span: 5 }"
+              :wrapperCol="{ span: 17 }"
+            >
+              <a-select
+                v-model="form.bank"
+                @change="bankChange"
+                placeholder="请选择"
+                :disabled="disableds"
+              >
+                <a-select-option value="1">电子调查表</a-select-option>
+                <a-select-option value="2">现场考察表</a-select-option>
+                <a-select-option value="3">合格评审人</a-select-option>
+                <a-select-option value="4">绩效考核表</a-select-option>
+              </a-select>
+            </a-form-model-item>
+          </a-col>
+        </a-row>
+      </a-form-model>
+    </a-card>
+    <a-card>
+      <a-table
+        :columns="columns"
+        :row-selection="{
+          selectedRowKeys: selectedRowKeys,
+          onChange: onSelectChange,
+        }"
+        :dataSource="dataSource"
+      >
+        <template slot="ifForce" slot-scope="text, record">
+          <a-checkbox
+            :checked="record.ifForce === 1 ? true : false"
+            @change="(e) => changeBoxIfForce(e, record)"
+          >
+          </a-checkbox>
+        </template>
+        <template slot="ifAttachment" slot-scope="text, record">
+          <a-checkbox
+            :checked="record.ifAttachment === 1 ? true : false"
+            @change="(e) => changeBoxIfAttachment(e, record)"
+          >
+          </a-checkbox>
+        </template>
+        <template slot="balance" slot-scope="text, record">
+          <a-input v-model="record.balance" />
+        </template>
+      </a-table>
+    </a-card>
+    <a-row>
+      <a-col :span="24" class="btn-sty" style="margin-top: 20px">
+        <a-button type="primary" @click="editEsurvey" v-if="this.id">
+          保存
+        </a-button>
+        <a-button type="primary" @click="addEsurvey" v-else> 创建 </a-button>
+        <a-button @click="back()"> 返回 </a-button>
+      </a-col>
+    </a-row>
+  </div>
+</template>
+<script>
+import {
+  vendorQualifyReviewPostRequestAll,
+  vendorQualifyReviewShowGetRequest,
+  vendorQualifyReviewPutRequestAll,
+  vendorGetRequest,
+  vendorTemplateQbankReturnvoGetRequest,
+} from "@/services/supplier/index";
+const columns = [
+  {
+    title: "调查指标",
+    width: 200,
+    dataIndex: "type",
+  },
+  {
+    title: "调查子指标",
+    dataIndex: "name",
+    width: 150,
+  },
+  {
+    title: "内容",
+    dataIndex: "content",
+  },
+  {
+    title: "强制",
+    dataIndex: "ifForce",
+    width: 150,
+    scopedSlots: { customRender: "ifForce" },
+  },
+  {
+    title: "是否需要附件",
+    dataIndex: "ifAttachment",
+    scopedSlots: { customRender: "ifAttachment" },
+  },
+  {
+    title: "得分范围",
+    dataIndex: "scoreScope",
+  },
+  {
+    title: "权重",
+    dataIndex: "balance",
+    scopedSlots: { customRender: "balance" },
+  },
+];
+export default {
+  name: "addEsurvey",
+  components: {},
+
+  data () {
+    return {
+      disableds: false,
+      selectedRowKeys: [],
+      vendorList: [],
+      form: {
+        vendorId: "", //供应商
+        name: "", // 调查表名称
+        responsiblePerson: "", // 负责人
+        bank: "",
+      },
+      rules: {
+        vendorId: [
+          {
+            required: true,
+            message: "采购组织名称不能为空",
+            trigger: "change",
+          },
+        ],
+        name: [
+          {
+            required: true,
+            message: "调查表名称不能为空",
+            trigger: "blur",
+          },
+        ],
+        responsiblePerson: [
+          {
+            required: true,
+            message: "负责人不能为空",
+            trigger: "blur",
+          },
+        ],
+      },
+      columns: columns,
+      dataSource: [],
+      id: this.$store.state.account.eSurveyId,
+    };
+  },
+  mounted () {
+    this.getvendorListAll();
+    if (this.id) {
+      this.getShowAll(this.id);
+    } else {
+      this.$refs.ruleForm.resetFields();
+    }
+  },
+  methods: {
+    // 请求修改数据
+    getShowAll (id) {
+      vendorQualifyReviewShowGetRequest(id).then((response) => {
+        this.form.id = response.data.id;
+        this.form.vendorId = response.data.vendorId;
+        this.form.name = response.data.name;
+        this.form.responsiblePerson = response.data.responsiblePerson;
+        this.dataSource = response.data.vendorQualifyReviewDetailVOS;
+        this.selectedRowKeys = this.dataSource.map(function (item, index) {
+          return index
+        })
+      });
+    },
+    // 强制改变
+    changeBoxIfForce (e, data) {
+      data.ifForce = e.target.checked === true ? 1 : 0;
+    },
+    // 是否需要文件
+    changeBoxIfAttachment (e, data) {
+      data.ifAttachment = e.target.checked === true ? 1 : 0;
+    },
+    // 模板改变
+    bankChange (value) {
+      vendorTemplateQbankReturnvoGetRequest({
+        currentPage: "1",
+        templateId: value,
+      }).then((response) => {
+        this.dataSource = response.data.records.map(function (item, index) {
+          return item.vendorQuestionBankVO;
+        });
+      });
+    },
+    // 查询模板
+    getvendorListAll () {
+      vendorGetRequest({
+        currentPage: "1",
+        deleted: 0,
+      }).then((response) => {
+        this.vendorList = response.data.records;
+      });
+    },
+    // 多选
+    onSelectChange (selectedRowKeys) {
+      this.selectedRowKeys = selectedRowKeys;
+    },
+    // 添加
+    addEsurvey () {
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          let data = [];
+          for (let i = 0; i < this.selectedRowKeys.length; i++) {
+            data.push(this.dataSource[i]);
+          }
+          let list = data.map(function (item, idnex) {
+            delete item.id;
+            return item;
+          });
+          vendorQualifyReviewPostRequestAll({
+            name: this.form.name,
+            vendorId: this.form.vendorId,
+            responsiblePerson: this.form.responsiblePerson,
+            vendorQualifyReviewDetailDTOS: list,
+          }).then((response) => {
+            if (response.code === 0) {
+              this.$message.success("添加成功");
+              this.back();
+            } else {
+              this.$message.error(response.message);
+            }
+          });
+        }
+      });
+    },
+    // 修改
+    editEsurvey () {
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          let data = [];
+          for (let i = 0; i < this.selectedRowKeys.length; i++) {
+            data.push(this.dataSource[i]);
+          }
+          let list = data.map(function (item, idnex) {
+            delete item.id;
+            return item;
+          });
+          vendorQualifyReviewPutRequestAll({
+            id: this.form.id,
+            name: this.form.name,
+            vendorId: this.form.vendorId,
+            responsiblePerson: this.form.responsiblePerson,
+            vendorQualifyReviewDetailDTOS: list,
+          }).then((response) => {
+            if (response.code === 0) {
+              this.$message.success("添加成功");
+              this.back();
+            } else {
+              this.$message.error(response.message);
+            }
+          });
+        }
+      });
+    },
+    saveFind () {
+      if (this.form.quotationDeadline) {
+        this.form.quotationDeadline = this.$moment(
+          this.form.quotationDeadline
+        ).format("YYYY-MM-DD");
+      }
+      let childFrom = { ...this.form, ...this.$refs.refChild.form };
+      inquirySheetPutRequest({
+        ...childFrom,
+      }).then((response) => {
+        if (response.code === 0) {
+          this.$message.success("修改成功");
+          // this.dataClose();
+          this.back();
+        } else {
+          this.$message.error(response.message);
+        }
+      });
+    },
+
+    back () {
+      this.$router.push({
+        path: "/supply/review",
+      });
+    },
+  },
+};
+</script>
+<style lang="less" scoped>
+.btn-sty {
+  text-align: center;
+  margin-bottom: 20px;
+  button {
+    margin-left: 10px;
+  }
+}
+.menu-content {
+  float: left;
+  width: calc(100% - 160px);
+  padding: 20px;
+}
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+  transform: translateX(100px);
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.5s ease;
+}
+</style>

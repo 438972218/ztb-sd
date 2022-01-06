@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  ztb-portal-mid:
+    image: 10.20.54.132:8000/ztb-sd/ztb-portal:latest
+    container_name: ztb-portal-mid
+    env_file:
+      - conf/portal
+    networks:
+      - ztb_net
+
+networks:
+  ztb_net:
+    external: true

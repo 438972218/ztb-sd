@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="beauty-scroll">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title>尚德-电子采购招标平台</title>
+    <style>
+      input:-webkit-autofill { 
+        box-shadow: 0 0 0px 1000px #061c43 inset !important; 
+        -webkit-text-fill-color: white; 
+      }
+      ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 4px;
+            background: #E0E3E7;
+            height: 20px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+    </style>
+  </head>
+  <body class="beauty-scroll">
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

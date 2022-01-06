@@ -1,0 +1,9 @@
+TZ=Asia/Shanghai
+EPURCHASE_SERVER_NAME=epurchase.suntech-power.com.cn
+EPURCHASE_PROXY_PASS=proxy-bus
+ESOURCING_SERVER_NAME=esourcing.suntech-power.com.cn
+ESOURCING_PROXY_PASS=proxy-bus
+EFILE_SERVER_NAME=efile.suntech-power.com.cn
+EFILE_PROXY_PASS=efile
+SSL_CERTIFICATE=suntech-power.com.cn.pem
+SSL_CERTIFICATE_KEY=suntech-power.com.cn.key

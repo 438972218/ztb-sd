@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xdcplus.vendor.mapper.OfferMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xdcplus.vendor.common.pojo.entity.Offer">
+        <id column="id" property="id"/>
+        <result column="money" property="money"/>
+        <result column="offer_time" property="offerTime"/>
+        <result column="offer_user" property="offerUser"/>
+        <result column="request_id" property="requestId"/>
+        <result column="offer_goods" property="offerGoods"/>
+        <result column="vendor_id" property="vendorId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="available" property="available"/>
+        <result column="trigger_threshold" property="triggerThreshold"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="description" property="description"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        money,
+        offer_time,
+        offer_user,
+        request_id,
+        offer_goods,
+        vendor_id,
+        parent_id,
+        available,
+        trigger_threshold,
+        created_user,
+        created_time,
+        updated_user,
+        updated_time,
+        description
+    </sql>
+    <select id="findOfferByOfferGoods" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from xdc_t_offer
+        where offer_goods = #{offerGoods,jdbcType=VARCHAR}
+          and request_id = #{requestId,jdbcType=BIGINT}
+    </select>
+    <select id="findOffer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from xdc_t_offer
+        <where>
+            <if test="offerGoods != null and offerGoods != ''">
+                and offer_goods = #{offerGoods,jdbcType=VARCHAR}
+            </if>
+            <if test="offerUser != null and offerUser != ''">
+                and offer_user = #{offerUser,jdbcType=VARCHAR}
+            </if>
+            <if test="vendorId != null">
+                and vendor_id = #{vendorId,jdbcType=BIGINT}
+            </if>
+            <if test="requestId != null">
+                and request_id = #{requestId,jdbcType=BIGINT}
+            </if>
+            <if test="startTime != null and endTime != null">
+                and offer_time between #{startTime,jdbcType=BIGINT} and #{endTime,jdbcType=BIGINT}
+            </if>
+            <if test="parentId != null">
+                and parent_id = #{parentId}
+            </if>
+            <if test="available != null">
+                and available = #{available,jdbcType=TINYINT}
+            </if>
+            <if test="triggerThreshold != null">
+                and trigger_threshold = #{triggerThreshold,jdbcType=TINYINT}
+            </if>
+            order by created_time desc
+        </where>
+    </select>
+    <select id="findOfferByParentId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from xdc_t_offer
+        where parent_id = #{parentId}
+    </select>
+
+    <update id="updateAvailableById">
+        update xdc_t_offer
+        set available = #{available,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateTriggerThresholdById">
+        update xdc_t_offer
+        set trigger_threshold = #{triggerThreshold,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="findOffers" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from xdc_t_offer
+        where offer_goods = #{offerGoods,jdbcType=VARCHAR}
+          and offer_user = #{offerUser,jdbcType=VARCHAR}
+          and available = #{available,jdbcType=TINYINT}
+          and request_id = #{requestId,jdbcType=BIGINT}
+    </select>
+
+    <select id="latestMaxGroupOffer" resultMap="BaseResultMap">
+        SELECT s.*
+        FROM xdc_t_offer s
+                     INNER JOIN (
+                SELECT `offer_user`,
+                       MAX(CONVERT(money, DECIMAL (20, 5))) money
+                FROM xdc_t_offer
+                <where>
+                    request_id = #{requestId,jdbcType=BIGINT}
+                    AND offer_goods = #{offerGoods,jdbcType=VARCHAR}
+                    <if test="available != null">
+                        AND available = #{available,jdbcType=TINYINT}
+                    </if>
+                </where>
+                GROUP BY offer_user
+                ) b ON s.offer_user = b.offer_user
+                AND s.money = b.money
+                <if test="available != null">
+                    AND s.available = #{available,jdbcType=TINYINT}
+                </if>
+    </select>
+
+    <select id="latestMinGroupOffer" resultMap="BaseResultMap">
+        SELECT s.*
+        FROM xdc_t_offer s
+                     INNER JOIN (
+                SELECT `offer_user`,
+                       MIN(CONVERT(money, DECIMAL (20, 5))) money
+                FROM xdc_t_offer
+                <where>
+                    request_id = #{requestId,jdbcType=BIGINT}
+                    AND offer_goods = #{offerGoods,jdbcType=VARCHAR}
+                    <if test="available != null">
+                        AND available = #{available,jdbcType=TINYINT}
+                    </if>
+                </where>
+                GROUP BY offer_user
+                ) b ON s.offer_user = b.offer_user
+                AND s.money = b.money
+                <if test="available != null">
+                    AND s.available = #{available,jdbcType=TINYINT}
+                </if>
+    </select>
+
+    <select id="groupMaxOfferByRequestId" resultMap="BaseResultMap">
+        SELECT s.*
+                FROM xdc_t_offer s
+                INNER JOIN (SELECT offer_user, offer_goods, MAX(CONVERT(money, DECIMAL (20, 5))) AS money
+        FROM xdc_t_offer
+        <where>
+            and request_id = #{requestId,jdbcType=BIGINT}
+            <if test="available != null">
+                AND available = #{available,jdbcType=TINYINT}
+            </if>
+            <choose>
+                <when test="flag">
+                    and parent_id = 0
+                </when>
+                <otherwise>
+                    and parent_id != 0
+                </otherwise>
+            </choose>
+        </where>
+        GROUP BY offer_user, offer_goods) b ON s.offer_user = b.offer_user
+                AND s.money = b.money
+                AND s.offer_goods = b.offer_goods
+                <if test="available != null">
+                    AND s.available = #{available,jdbcType=TINYINT}
+                </if>
+    </select>
+
+    <select id="groupMinOfferByRequestId" resultMap="BaseResultMap">
+        SELECT s.*
+                FROM xdc_t_offer s
+                INNER JOIN (SELECT offer_user, offer_goods, MIN(CONVERT(money, DECIMAL (20, 5))) AS money
+        FROM xdc_t_offer
+        <where>
+            and request_id = #{requestId,jdbcType=BIGINT}
+            <if test="available != null">
+                AND available = #{available,jdbcType=TINYINT}
+            </if>
+            <choose>
+                <when test="flag">
+                    and parent_id = 0
+                </when>
+                <otherwise>
+                    and parent_id != 0
+                </otherwise>
+            </choose>
+        </where>
+        GROUP BY offer_user, offer_goods) b ON s.offer_user = b.offer_user
+                AND s.money = b.money
+                AND s.offer_goods = b.offer_goods
+                <if test="available != null">
+                    AND s.available = #{available,jdbcType=TINYINT}
+                </if>
+    </select>
+
+    <select id="groupOfferParentIdsByRequestId" resultType="java.lang.Long">
+        SELECT
+            parent_id
+        FROM
+            xdc_t_offer
+        <where>
+            request_id = #{requestId,jdbcType=BIGINT}
+            <if test="available != null">
+                AND available = #{available,jdbcType=TINYINT}
+            </if>
+        </where>
+        GROUP BY
+            parent_id
+        HAVING COUNT(DISTINCT parent_id)=1
+    </select>
+
+    <select id="findCategoryBiddingItems" resultType="com.xdcplus.vendor.common.pojo.bo.BidItemsBO">
+        SELECT
+                a.offer_user,
+                a.offer_goods
+        FROM
+                xdc_t_offer AS a
+        where a.request_id = #{requestId,jdbcType=BIGINT}
+          and a.available = #{available,jdbcType=TINYINT}
+        GROUP BY
+                a.offer_user,
+                a.offer_goods
+    </select>
+
+    <select id="findLastOfferByOfferUser" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from xdc_t_offer
+        where offer_user = #{offerUser,jdbcType=VARCHAR}
+        and offer_goods = #{offerGoods,jdbcType=VARCHAR}
+        and request_id = #{requestId,jdbcType=BIGINT}
+        and available = #{available,jdbcType=TINYINT}
+        order by offer_time desc
+        LIMIT 1
+    </select>
+</mapper>

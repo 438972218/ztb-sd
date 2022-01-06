@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xdcplus.statement.mapper.PaidMaterialMandateMapper">
+
+    <resultMap type="com.xdcplus.statement.common.pojo.entity.PaidMaterialMandate" id="PaidMaterialMandateMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="paidMaterialId" column="paid_material_id" jdbcType="INTEGER"/>
+        <result property="paidVendorId" column="paid_vendor_id" jdbcType="INTEGER"/>
+        <result property="paidVendorUserId" column="paid_vendor_user_id" jdbcType="INTEGER"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="confirmedPrice" column="confirmed_price" jdbcType="NUMERIC"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="createdUser" column="created_user" jdbcType="VARCHAR"/>
+        <result property="createdTime" column="created_time" jdbcType="INTEGER"/>
+        <result property="updatedUser" column="updated_user" jdbcType="VARCHAR"/>
+        <result property="updatedTime" column="updated_time" jdbcType="INTEGER"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+        <result property="deleted" column="deleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPaidMaterialMandate" resultMap="PaidMaterialMandateMap">
+        select
+          id, paid_material_id, paid_vendor_id, paid_vendor_user_id, price, confirmed_price, remark, created_user, created_time, updated_user, updated_time, description, version, deleted
+          from scm_paid_material_mandate
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="paidMaterialId != null">
+                and paid_material_id = #{paidMaterialId}
+            </if>
+            <if test="paidVendorId != null">
+                and paid_vendor_id = #{paidVendorId}
+            </if>
+            <if test="paidVendorUserId != null">
+                and paid_vendor_user_id = #{paidVendorUserId}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="confirmedPrice != null">
+                and confirmed_price = #{confirmedPrice}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="createdUser != null and createdUser != ''">
+                and created_user = #{createdUser}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedUser != null and updatedUser != ''">
+                and updated_user = #{updatedUser}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            <if test="description != null and description != ''">
+                and description = #{description}
+            </if>
+            <if test="version != null">
+                and version = #{version}
+            </if>
+            <if test="deleted != null">
+                and deleted = #{deleted}
+            </if>
+        </where>
+    </select>
+
+</mapper>
+

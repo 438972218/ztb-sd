@@ -1,0 +1,248 @@
+version: "3"
+
+services:
+  eureka:
+    image: eureka:latest
+    container_name: eureka
+    hostname: eureka
+    restart: always
+#    ports:
+#      - 8761:8761
+    env_file:
+      - conf/common
+    expose:
+      - 8761
+    volumes:
+      - /data/ztb-sd/eureka:/logs
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - ztb_net
+
+  workflow-service:
+    image: workflow-service:latest
+    container_name: workflow-service
+    hostname: workflow-service
+    restart: always
+    env_file:
+      - conf/common
+      - conf/workflow
+#    ports:
+#      - 9011:8080
+    expose:
+      - 8080
+    volumes:
+      - /data/ztb-sd/workflow-service:/logs
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - eureka
+    networks:
+      - ztb_net
+
+  permission-service:
+    image: permission-service:latest
+    container_name: permission-service
+    hostname: permission-service
+    restart: always
+    env_file:
+      - conf/common
+      - conf/permission
+#    ports:
+#      - 9012:8080
+    expose:
+      - 8080
+    volumes:
+      - /data/ztb-sd/permission-service:/logs
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - eureka
+    networks:
+      - ztb_net
+
+  sourcing-service:
+    image: sourcing-service:latest
+    container_name: sourcing-service
+    hostname: sourcing-service
+    restart: always
+    extra_hosts:
+      - "efiledown.suntech-power.com.cn:172.18.50.108"
+    env_file:
+      - conf/common
+      - conf/sourcing
+#    ports:
+#      - 9013:8080
+    expose:
+      - 8080
+    volumes:
+      - /data/ztb-sd/sourcing-service:/logs
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - eureka
+      - workflow-service
+    networks:
+      - ztb_net
+
+  vendor-service:
+    image: vendor-service:latest
+    container_name: vendor-service
+    hostname: vendor-service
+    restart: always
+    extra_hosts:
+      - "efiledown.suntech-power.com.cn:172.18.50.108"
+    env_file:
+      - conf/common
+      - conf/vendor
+#    ports:
+#      - 9014:8080
+    expose:
+      - 8080
+    volumes:
+      - /data/ztb-sd/vendor-service:/logs
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - eureka
+    networks:
+      - ztb_net
+
+  vendor-perm-service:
+    image: vendor-perm-service:latest
+    container_name: vendor-perm-service
+    hostname: vendor-perm-service
+    restart: always
+    env_file:
+      - conf/common
+      - conf/vendor-perm
+#    ports:
+#      - 9015:8080
+    expose:
+      - 8080
+    volumes:
+      - /data/ztb-sd/vendor-perm-service:/logs
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - eureka
+    networks:
+      - ztb_net
+
+  scheduling-service:
+    image: scheduling-service:latest
+    container_name: scheduling-service
+    hostname: scheduling-service
+    restart: always
+    #    ports:
+    #      - 8080:8080
+    env_file:
+      - conf/common
+      - conf/scheduling
+    expose:
+      - 8080
+    volumes:
+      - /data/ztb-sd/scheduling-service:/logs
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - eureka
+      - workflow-service
+      - sourcing-service
+      - vendor-service
+      - permission-service
+      - vendor-perm-service
+    networks:
+      - ztb_net
+
+  ztb-portal:
+    image: ztb-portal:latest
+    container_name: ztb-portal
+    hostname: ztb-portal
+    restart: always
+    env_file:
+      - conf/portal
+#    ports:
+#      - 81:80
+    expose:
+      - 80
+    networks:
+      - ztb_net
+
+  ztb-web:
+    image: ztb-web:latest
+    container_name: ztb-web
+    hostname: ztb-web
+    restart: always
+    env_file:
+      - conf/web
+    #    ports:
+    #      - 80:80
+    expose:
+      - 80
+    networks:
+      - ztb_net
+
+  efile:
+    image: minio/minio:RELEASE.2021-07-12T02-44-53Z
+    container_name: efile
+    hostname: efile
+    restart: always
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    env_file:
+      - conf/efile
+    logging:
+      options:
+        max-size: "50M"
+        max-file: "10"
+      driver: json-file
+    volumes:
+      - /data/efiledown/data:/data
+    networks:
+      - ztb_net
+
+  proxy-bus:
+    image: proxy-bus:1.0
+    container_name: proxy-bus
+    hostname: proxy-bus
+    restart: always
+    env_file:
+      - conf/proxy-bus
+    expose:
+      - 80
+    volumes:
+      - /data/ztb-sd/proxy-bus/logs:/var/log/nginx
+    depends_on:
+      - ztb-web
+      - ztb-portal
+      - scheduling-service
+    networks:
+      - ztb_net
+
+  proxy-ssl:
+    image: proxy-ssl:1.0
+    container_name: proxy-ssl
+    hostname: proxy-ssl
+    restart: always
+    env_file:
+      - conf/proxy-ssl
+    ports:
+      - 80:80
+      - 443:443
+      - 9000:9000
+      - 9001:9001
+    expose:
+      - 80
+      - 443
+      - 9000
+      - 9001
+    volumes:
+      - /data/ztb-sd/proxy-ssl/logs:/var/log/nginx
+      - ./conf/ssl-crt/suntech-power.com.cn.pem:/usr/local/nginx/crt/suntech-power.com.cn.pem
+      - ./conf/ssl-crt/suntech-power.com.cn.key:/usr/local/nginx/crt/suntech-power.com.cn.key
+    depends_on:
+      - proxy-bus
+    networks:
+      - ztb_net
+
+networks:
+  ztb_net:
+    external: true

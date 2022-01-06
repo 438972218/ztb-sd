@@ -1,0 +1,4 @@
+AUTH_HOST=172.18.50.108
+AUTH_PORT=80
+AUTH_URL=/api/perm/anon/getPublicKey
+

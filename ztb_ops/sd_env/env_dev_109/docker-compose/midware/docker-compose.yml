@@ -1,0 +1,83 @@
+version: "3"
+
+services:
+  mid-regcenter:
+    image: regcenter:latest
+    container_name: mid-regcenter
+    hostname: eureka
+    restart: always
+    ports:
+      - 8760:8760
+    env_file:
+      - conf/common
+    expose:
+      - 8760
+    volumes:
+      - /data/midware/mid-regcenter:/logs
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - mid_net
+
+  mid-workflow:
+    image: workflow-service:latest
+    container_name: mid-workflow
+    hostname: mid-workflow
+    restart: always
+    env_file:
+      - conf/common
+      - conf/workflow
+    ports:
+      - 19011:8080
+    expose:
+      - 8080
+    volumes:
+      - /data/midware/mid-workflow:/logs
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - mid-regcenter
+      - mid-mysql
+    networks:
+      - mid_net
+
+  mid-mysql:
+    image: mysql:5.7.34
+    container_name: mid-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "1q2w3e4r"
+    restart: always
+    privileged: true
+    command: [
+      '--character-set-server=utf8mb4',
+      '--collation-server=utf8mb4_unicode_ci',
+      '--default-time-zone=+8:00'
+    ]
+    ports:
+      - 13306:3306
+    volumes:
+      - /data/midware/mid-mysql:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/my.cnf
+      - ./init:/docker-entrypoint-initdb.d
+    networks:
+      - mid_net
+
+  mid-redis:
+    image: redis:latest
+    container_name: mid-redis
+    ports:
+      - 16379:6379
+    environment:
+      - JAVA_OPTS="-Xms256m -Xmx512m"
+      - TZ=Asia/Shanghai
+    user: root
+    restart: always
+    volumes:
+      - /data/midware/mid-redis:/data
+      - ./redis/redis.conf:/etc/redis/redis.conf
+    command: sh -c "touch /etc/sysctl.conf && chmod +x /etc/sysctl.conf && echo 'net.core.somaxconn= 1024' > /etc/sysctl.conf && redis-server /etc/redis/redis.conf"
+    networks:
+      - mid_net
+
+
+networks:
+  mid_net:
+    external: true

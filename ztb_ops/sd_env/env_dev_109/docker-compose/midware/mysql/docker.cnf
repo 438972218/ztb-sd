@@ -1,0 +1,15 @@
+[mysqld]
+skip-host-cache
+skip-name-resolve
+user=mysql
+default-storage-engine=INNODB
+#character-set-server=utf8
+character-set-client-handshake=FALSE
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
+init_connect='SET NAMES utf8mb4'
+lower_case_table_names=1
+wait_timeout=604800
+interactive_timeout=31536000
+[mysql]
+default-character-set=utf8mb4

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xdcplus.workflow.mapper.DiscussInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.xdcplus.workflow.common.pojo.bo.DiscussInfoBO">
+        <id column="id" property="id" />
+        <result column="group_id" property="groupId" />
+        <result column="content" property="content" />
+        <result column="from_user" property="fromUser" />
+        <result column="created_user" property="createdUser" />
+        <result column="created_time" property="createdTime" />
+        <result column="updated_user" property="updatedUser" />
+        <result column="updated_time" property="updatedTime" />
+        <result column="description" property="description" />
+        <association property="group" javaType="com.xdcplus.workflow.common.pojo.entity.DiscussGroup" columnPrefix="grp_">
+            <id column="id" property="id" />
+            <result column="request_id" property="requestId" />
+            <result column="subject" property="subject" />
+            <result column="created_user" property="createdUser" />
+            <result column="created_time" property="createdTime" />
+            <result column="updated_user" property="updatedUser" />
+            <result column="updated_time" property="updatedTime" />
+            <result column="description" property="description" />
+        </association>
+        <collection property="relations" ofType="com.xdcplus.workflow.common.pojo.entity.DiscussRecordRelation" columnPrefix="relation_">
+            <id column="id" property="id" />
+            <result column="to_user" property="toUser" />
+            <result column="record_id" property="recordId" />
+        </collection>
+    </resultMap>
+
+    <sql id="Record_Column_List">
+        ${alias}.id as id, ${alias}.group_id as group_id, ${alias}.content as content,
+        ${alias}.from_user as from_user,${alias}.created_user as created_user,
+        ${alias}.updated_user as updated_user, ${alias}.created_time as created_time,
+        ${alias}.updated_time as updated_time, ${alias}.description as description
+    </sql>
+
+    <sql id="Group_Column_List">
+        ${alias}.id as ${alias}_id,${alias}.request_id as ${alias}_request_id,${alias}.subject as ${alias}_subject,
+        ${alias}.created_user as ${alias}_created_user, ${alias}.updated_user as ${alias}_updated_user,
+        ${alias}.created_time as ${alias}_created_time, ${alias}.updated_time as ${alias}_updated_time,
+        ${alias}.description as ${alias}_description
+    </sql>
+
+    <sql id="Relation_Column_List">
+        ${alias}.id as ${alias}_id,${alias}.to_user as ${alias}_to_user,${alias}.record_id as ${alias}_record_id
+    </sql>
+
+    <select id="findDiscussInfoByRequestId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Record_Column_List"><property name="alias" value="record"/></include>,
+        <include refid="Group_Column_List"><property name="alias" value="grp"/></include>,
+        <include refid="Relation_Column_List"><property name="alias" value="relation"/></include>
+        FROM
+            xdc_t_discuss_record AS record
+            LEFT JOIN xdc_t_discuss_group AS grp ON record.group_id = grp.id
+            LEFT JOIN xdc_t_discuss_record_relation AS relation ON relation.record_id = record.id
+        WHERE
+            grp.request_id = #{requestId,jdbcType=BIGINT}
+    </select>
+
+    <select id="findDiscussInfoByGroupId" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Record_Column_List"><property name="alias" value="record"/></include>,
+            <include refid="Group_Column_List"><property name="alias" value="grp"/></include>,
+            <include refid="Relation_Column_List"><property name="alias" value="relation"/></include>
+        FROM
+            xdc_t_discuss_record AS record
+            LEFT JOIN xdc_t_discuss_group AS grp ON record.group_id = grp.id
+            LEFT JOIN xdc_t_discuss_record_relation AS relation ON relation.record_id = record.id
+        WHERE
+            grp.id = #{groupId,jdbcType=BIGINT}
+    </select>
+
+</mapper>

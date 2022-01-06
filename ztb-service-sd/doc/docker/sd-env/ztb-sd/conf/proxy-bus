@@ -1,0 +1,7 @@
+TZ=Asia/Shanghai
+EPURCHASE_SERVER_NAME=epurchase.suntech-power.com.cn
+EPURCHASE_GATEWAY=scheduling-service:8080
+EPURCHASE_PROXY_PASS=ztb-web
+ESOURCING_SERVER_NAME=esourcing.suntech-power.com.cn
+ESOURCING_GATEWAY=scheduling-service:8080
+ESOURCING_PROXY_PASS=ztb-portal

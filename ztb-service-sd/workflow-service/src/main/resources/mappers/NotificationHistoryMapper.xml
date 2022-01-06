@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xdcplus.workflow.mapper.NotificationHistoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xdcplus.workflow.common.pojo.entity.NotificationHistory">
+        <id column="id" property="id" />
+        <result column="type" property="type" />
+        <result column="message_id" property="messageId" />
+        <result column="subject" property="subject" />
+        <result column="content" property="content" />
+        <result column="mail_from" property="mailFrom" />
+        <result column="mail_to" property="mailTo" />
+        <result column="mail_cc" property="mailCc" />
+        <result column="mail_bcc" property="mailBcc" />
+        <result column="mail_reply" property="mailReply" />
+        <result column="created_time" property="createdTime" />
+        <result column="updated_time" property="updatedTime" />
+        <result column="created_user" property="createdUser" />
+        <result column="updated_user" property="updatedUser" />
+        <result column="description" property="description" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, type,  message_id, subject, content, mail_from, mail_to,
+         mail_cc, mail_bcc, mail_reply, created_time, updated_time,
+         created_user, updated_user, description
+    </sql>
+    <sql id="Base_Column_List1">
+        h.id, h.type, h.message_id, h.subject, h.content, h.mail_from, h.mail_to,
+         h.mail_cc, h.mail_bcc, h.mail_reply, h.created_time, h.updated_time,
+         h.created_user, h.updated_user, h.description
+    </sql>
+    <select id="findNotificationHistory" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List1"/>
+        from
+            xdc_t_notification_history as h
+            left join xdc_t_notification_relation as r on h.id = r.history_id
+        <where>
+            <if test="type != null">
+                and h.type = #{type,jdbcType=TINYINT}
+            </if>
+             <if test="type != null">
+                and h.message_id = #{messageId,jdbcType=VARCHAR}
+            </if>
+            <if test="requestId != null">
+                and r.request_id = #{requestId,jdbcType=VARCHAR}
+            </if>
+            <if test="flowId != null">
+                and r.flow_id = #{flowId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,10 @@
+WS_PROTOCOL=wss
+SEVER_HOST=http://10.20.54.142
+SEVER_IP=10.20.54.142
+SEVER_PORT=443
+API_SRG_PREFIX=/api/sourcing
+API_ZTB_PREFIX=/api/vendor
+API_AUTH_PREFIX=/api/vperm
+API_PCE_PREFIX=/api/vperm
+API_IE_PREFIX=/api/workflow
+API_WS_PREFIX=/api/vendor-websocket

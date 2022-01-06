@@ -1,0 +1,11 @@
+TZ=Asia/Shanghai
+WS_PROTOCOL=ws
+SEVER_HOST=http://10.20.54.162
+SEVER_IP=10.20.54.162
+SEVER_PORT=8080
+API_SRG_PREFIX=/sourcing
+API_ZTB_PREFIX=/vendor
+API_AUTH_PREFIX=/vperm
+API_PCE_PREFIX=/vperm
+API_IE_PREFIX=/workflow
+API_WS_PREFIX=/vendor-websocket

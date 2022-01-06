@@ -1,0 +1,11 @@
+TZ=Asia/Shanghai
+WS_PROTOCOL=wss
+SEVER_HOST=https://epurchase.suntech-power.com.cn
+SEVER_IP=epurchase.suntech-power.com.cn
+SEVER_PORT=443
+API_ZTB_PREFIX=/api/sourcing
+API_AUTH_PREFIX=/api/perm
+API_PCE_PREFIX=/api/perm
+API_IE_PREFIX=/api/workflow
+API_VENDOR_PREFIX=/api/vendor
+API_WS_PREFIX=/api/vendor-websocket

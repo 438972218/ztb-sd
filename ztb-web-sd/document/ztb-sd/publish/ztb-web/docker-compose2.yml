@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+
+  ztb-web-sd:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ztb-web-sd
+    container_name: ztb-web-sd
+    restart: always
+    ports:
+      - 8500:80
+    expose:
+      - 80
+    networks:
+      - ztb_net
+
+networks:
+  ztb_net:
+    external: true

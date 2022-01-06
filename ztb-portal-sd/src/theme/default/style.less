@@ -1,0 +1,69 @@
+.week-mode{
+  overflow: hidden;
+  filter: invert(80%);
+}
+.beauty-scroll{
+  scrollbar-color: @primary-color @primary-2;
+  scrollbar-width: thin;
+  -ms-overflow-style:none;
+  position: relative;
+  &::-webkit-scrollbar{
+    width: 3px;
+    height: 1px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: @primary-color;
+  }
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 1px rgba(0,0,0,0);
+    border-radius: 3px;
+    background: @primary-3;
+  }
+}
+.split-right{
+  &:not(:last-child) {
+    border-right: 1px solid rgba(98, 98, 98, 0.2);
+  }
+}
+.disabled{
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+// .form-item-style{
+//   margin-bottom: 10px;
+// }
+.card-top{
+  margin-bottom: 10px;
+  >div{
+    padding: 14px 14px 6px;
+  }
+}
+.content-title{
+  border-left: 6px solid #1890ff;
+  text-indent: 8px;
+  font-size: 14px;
+  // margin-bottom: 10px;
+  font-weight: bold;
+}
+.operator {
+  margin: 5px 0 18px 0;
+}
+.table-change{
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  z-index: 1 ;
+}
+.ant-card-body{
+  padding: 6px 20px;
+}
+.text-cursor {
+  color: #1890ff;
+  cursor: pointer;
+}
+.operation-style{
+  margin: 0 5px;
+  color: #1890ff;
+  cursor: pointer;
+}

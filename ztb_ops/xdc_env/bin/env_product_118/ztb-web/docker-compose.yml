@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  ztb-web:
+    image: 10.20.54.143:8000/ztb-sd/ztb-web:latest
+    container_name: ztb-web
+    env_file:
+      - conf/web
+    networks:
+      - ztb_net
+
+networks:
+  ztb_net:
+    external: true

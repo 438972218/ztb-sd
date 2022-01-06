@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xdcplus.workflow.mapper.UserToCustomRelationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xdcplus.workflow.common.pojo.entity.UserToCustomRelation">
+        <id column="id" property="id" />
+        <result column="user_to_mark" property="userToMark" />
+        <result column="config_id" property="configId" />
+        <result column="expression" property="expression" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_to_mark, config_id, expression
+    </sql>
+
+    <select id="findRelation" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        from xdc_t_user_to_custom_relation
+        where user_to_mark = #{userToMark,jdbcType=INTEGER}
+        and config_id = #{configId,jdbcType=BIGINT}
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

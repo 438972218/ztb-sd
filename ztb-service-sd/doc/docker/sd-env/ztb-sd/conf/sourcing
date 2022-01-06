@@ -1,0 +1,5 @@
+MYSQL_DATABASE=ztb_biz
+MINIO_ENDPOINT=https://efiledown.suntech-power.com.cn:9000
+MINIO_BUCKET=ztb
+MINIO_USERNAME=efile
+MINIO_PASSWORD=1q2w3e4r

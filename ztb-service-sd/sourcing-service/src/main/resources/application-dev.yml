@@ -1,0 +1,43 @@
+spring:
+
+  # mysql 配置
+  datasource:
+    url: jdbc:mysql://10.20.54.162:3306/ztb_biz?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+#    url: jdbc:mysql://172.18.50.109:3306/ztb_biz?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: root
+    password: xdcplus.com
+#    password: 1q2w3e4r
+
+  # redis 缓存配置
+  redis:
+    host: localhost
+    port: 6379
+    database: 2
+
+
+file:
+  minio:
+    enable: true
+    endpoint: http://10.20.54.162:9000
+    bucket: ztb
+    access-key: minio
+    secret-key: minio123
+
+#minio:
+#  endpoint: http://10.20.54.162:9000
+#  access-key: minio
+#  secret-key: minio123
+#  bucket: ztb
+
+#knife4j配置
+knife4j:
+  # 是否是生产模式
+  production: false
+
+website:
+  platFromName: https://1
+  vendorPlatFromName: https://2
+
+
+
+
